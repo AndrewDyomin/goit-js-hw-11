@@ -69,7 +69,7 @@ const searchFormSubmitHendler = async e => {
 
     loadMoreBtnEl.classList.remove('is-hidden');
   } catch (err) {
-    Notiflix.Notify.failure(err.message);
+    console.log(err.message);
   }
 };
 
