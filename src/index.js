@@ -1,4 +1,5 @@
 import { UnsplashAPI } from './unsplash-api';
+import Notiflix from 'notiflix';
 
 const inputEl = document.querySelector('.search-input');
 const searchFormEl = document.querySelector('.search-form');
@@ -6,10 +7,14 @@ const submitBtnEl = document.querySelector('.submit-btn');
 const galleryEl = document.querySelector('.gallery');
 const galleryListEl = document.querySelector('.gallery-list');
 const loadMoreBtnEl = document.querySelector('.load-more-btn');
-let q = '';
 const unsplashApi = new UnsplashAPI();
 
 function createGalleryCards (data) {
+  if (!data.hits.length) {
+    loadMoreBtnEl.classList.add('is-hidden');
+    Notiflix.Notify.info("We're sorry, but you've reached the end of search results.");
+    throw new Error();
+  }
   for (const foto of data.hits) {
     const markup = 
     `<li class="list-item">
@@ -43,8 +48,8 @@ function createGalleryCards (data) {
 
 const searchFormSubmitHendler = async e => {
   e.preventDefault();
+  galleryListEl.innerHTML = '';
   
-  console.log('click');
   const searchQuery = inputEl.value;
   unsplashApi.query = searchQuery;
   unsplashApi.page = 1;
@@ -53,15 +58,15 @@ const searchFormSubmitHendler = async e => {
     const { data } = await unsplashApi.fetchPhotos();
 
     if (!data.hits.length) {
-      console.log("Sorry, there are no images matching your search query. Please try again.");
+      Notiflix.Notify.info('Sorry, there are no images matching your search query. Please try again.');
       throw new Error();
     }
-    console.log(data.hits);
+    
     createGalleryCards(data);
 
     loadMoreBtnEl.classList.remove('is-hidden');
   } catch (err) {
-    console.log(err.message);
+    Notiflix.Notify.failure(err.message);
   }
 };
 
@@ -71,13 +76,15 @@ const LoadMoreBtnClickHandler = async () => {
   try {
     const { data } = await unsplashApi.fetchPhotos();
 
-    if (unsplashApi.page === data.total_pages) {
+    if (unsplashApi.page === 13) {
       loadMoreBtnEl.classList.add('is-hidden');
+
+      Notiflix.Notify.info("We're sorry, but you've reached the end of search results.");
     }
 
     createGalleryCards(data);
   } catch (err) {
-    console.log(err.message);
+    Notiflix.Notify.failure(err.message);
   }
 };
 
