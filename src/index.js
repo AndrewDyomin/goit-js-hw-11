@@ -88,7 +88,7 @@ const LoadMoreBtnClickHandler = async () => {
     createGalleryCards(data);
     lightbox.refresh();
   } catch (err) {
-    Notiflix.Notify.failure(err.message);
+    console.log(err.message);
   }
 };
 
