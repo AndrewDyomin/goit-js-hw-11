@@ -1,5 +1,7 @@
 import { UnsplashAPI } from './unsplash-api';
 import Notiflix from 'notiflix';
+import SimpleLightbox from "simplelightbox";
+import "simplelightbox/dist/simple-lightbox.min.css";
 
 const inputEl = document.querySelector('.search-input');
 const searchFormEl = document.querySelector('.search-form');
@@ -61,8 +63,9 @@ const searchFormSubmitHendler = async e => {
       Notiflix.Notify.info('Sorry, there are no images matching your search query. Please try again.');
       throw new Error();
     }
-    
+    Notiflix.Notify.info(`Hooray! We found ${data.totalHits} images.`)
     createGalleryCards(data);
+    lightbox.refresh();
 
     loadMoreBtnEl.classList.remove('is-hidden');
   } catch (err) {
@@ -83,10 +86,16 @@ const LoadMoreBtnClickHandler = async () => {
     }
 
     createGalleryCards(data);
+    lightbox.refresh();
   } catch (err) {
     Notiflix.Notify.failure(err.message);
   }
 };
+
+let lightbox = new SimpleLightbox('.photo-card a', {
+  captionsData: 'alt',
+  captionDelay: 250,
+});
 
 loadMoreBtnEl.addEventListener('click', LoadMoreBtnClickHandler);
 submitBtnEl.addEventListener('click', searchFormSubmitHendler);
