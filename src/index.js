@@ -56,6 +56,11 @@ const searchFormSubmitHendler = async e => {
   unsplashApi.query = searchQuery;
   unsplashApi.page = 1;
 
+  if (searchQuery.split(' ').join('').length === 0) {
+    Notiflix.Notify.warning("Enter your search query, please.");
+    throw new Error();
+  }
+
   try {
     const { data } = await unsplashApi.fetchPhotos();
 
@@ -66,10 +71,12 @@ const searchFormSubmitHendler = async e => {
     Notiflix.Notify.info(`Hooray! We found ${data.totalHits} images.`)
     createGalleryCards(data);
     lightbox.refresh();
-
-    loadMoreBtnEl.classList.remove('is-hidden');
+    
+    if (data.totalHits > 40) {
+      loadMoreBtnEl.classList.remove('is-hidden');
+    }
   } catch (err) {
-    console.log(err.message);
+    Notiflix.Notify.warning('Sorry, something went wrong. Please try later.');
   }
 };
 
@@ -79,16 +86,17 @@ const LoadMoreBtnClickHandler = async () => {
   try {
     const { data } = await unsplashApi.fetchPhotos();
 
-    if (unsplashApi.page === 13) {
+    createGalleryCards(data);
+    lightbox.refresh();
+
+    if (galleryListEl.childNodes.length === data.totalHits) {
       loadMoreBtnEl.classList.add('is-hidden');
 
       Notiflix.Notify.info("We're sorry, but you've reached the end of search results.");
     }
 
-    createGalleryCards(data);
-    lightbox.refresh();
   } catch (err) {
-    console.log(err.message);
+    Notiflix.Notify.warning('Sorry, something went wrong. Please try later.');
   }
 };
 
